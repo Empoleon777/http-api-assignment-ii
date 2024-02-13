@@ -1,89 +1,89 @@
+const users = {};
+
 const respondJSON = (request, response, status, object) => {
-    response.writeHead(status, { 'Content-Type': 'application/json' });
-    response.write(JSON.stringify(object));
-    response.end();
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  response.writeHead(status, headers);
+  response.write(JSON.stringify(object));
+  response.end();
 };
 
-const success = (request, response) => {
-    const responseJSON = {
-        message: 'This is a successful response.',
-    };
+const respondJSONMeta = (request, response, status) => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
 
-    respondJSON(request, response, 200, responseJSON);
+  response.writeHead(status, headers);
+  response.end();
 };
 
-const badRequest = (request, response, params) => {
-    const responseJSON = {
-        message: 'This request has the required parameters.',
-    };
+const getUsers = (request, response) => {
+  const responseJSON = {
+    users,
+  };
 
-    if (!params.valid || params.valid !== 'true') {
-        responseJSON.message = 'Missing valid query parameter set to true.';
-        responseJSON.id = 'Bad Request';
-
-        return respondJSON(request, response, 400, responseJSON);
-    }
-
-    return respondJSON(request, response, 200, responseJSON);
+  return respondJSON(request, response, 200, responseJSON);
 };
 
-const unauthorized = (request, response, params) => {
-    const responseJSON = {
-        message: 'You have successfully viewed the content.',
-    };
+const getUsersMeta = (request, response) => respondJSONMeta(request, response, 200);
 
-    if (!params.valid || params.valid !== 'true') {
-        responseJSON.message = 'Missing loggedIn query parameter set to true.';
-        responseJSON.id = 'Unauthorized';
+const updateUser = (request, response) => {
+  const newUser = {
+    createdAt: Date.now(),
+  };
 
-        return respondJSON(request, response, 401, responseJSON);
-    }
-
-    return respondJSON(request, response, 200, responseJSON);
+  users[newUser.createdAt] = newUser;
+  return respondJSON(request, response, 201, newUser);
 };
 
-const forbidden = (request, response) => {
-    const responseJSON = {
-        message: 'You do not have access to this content.',
-        id: 'Forbidden',
-    };
+const addUser = (request, response, body) => {
+  const responseJSON = {
+    message: 'Name and age are both required.',
+  };
 
-    return respondJSON(request, response, 403, responseJSON);
-};
+  if (!body.name || !body.age) {
+    responseJSON.id = 'missingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
 
-const internal = (request, response) => {
-    const responseJSON = {
-        message: 'Internal Server Error. Something went wrong.',
-        id: 'Internal',
-    };
+  let responseCode = 204;
 
-    return respondJSON(request, response, 500, responseJSON);
-};
+  if (!users[body.name]) {
+    responseCode = 201;
+    users[body.name] = {};
+  }
 
-const notImplemented = (request, response) => {
-    const responseJSON = {
-        message: 'A get request for this page has not been implemented yet. Check again later for updated content.',
-        id: 'Not Implemented',
-    };
+  users[body.name].name = body.name;
+  users[body.name].age = body.age;
 
-    return respondJSON(request, response, 501, responseJSON);
+  if (responseCode === 201) {
+    responseJSON.message = 'Created Successfully';
+    return respondJSON(request, response, responseCode, responseJSON);
+  }
+
+  return respondJSONMeta(request, response, responseCode);
 };
 
 const notFound = (request, response) => {
-    const responseJSON = {
-        message: 'The page you are looking for was not found.',
-        id: 'Not Found',
-    };
+  const responseJSON = {
+    message: 'The page you are looking for was not found.',
+    id: 'notFound',
+  };
 
-    respondJSON(request, response, 404, responseJSON);
+  respondJSON(request, response, 404, responseJSON);
+};
+
+const notFoundMeta = (request, response) => {
+  respondJSONMeta(request, response, 404);
 };
 
 module.exports = {
-    success,
-    badRequest,
-    unauthorized,
-    forbidden,
-    internal,
-    notImplemented,
-    notFound,
+  getUsers,
+  getUsersMeta,
+  updateUser,
+  addUser,
+  notFound,
+  notFoundMeta,
 };

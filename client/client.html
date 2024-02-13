@@ -26,10 +26,10 @@
           content.innerHTML = `Error code not implemented by client.`;
           break;
       }
-      
+
       let obj = await response.json();
 
-      if(parseResponse) {    
+      if (parseResponse) {
         let jsonString = JSON.stringify(obj);
         content.innerHTML += `<p>${jsonString}</p>`;
       }
