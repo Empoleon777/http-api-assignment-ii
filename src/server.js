@@ -3,7 +3,6 @@ const url = require('url');
 const query = require('querystring');
 const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
-const xmlHandler = require('./xmlResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
@@ -16,7 +15,16 @@ const urlStruct = {
 };
 
 const onRequest = (request, response) => {
+    const parsedUrl = new URL(request.url);
 
+    const acceptedTypes = request.headers.accept.split(',');
+
+    if (urlStruct[parsedUrl.pathname]) {
+        urlStruct[parsedUrl.pathname](request, response, acceptedTypes);
+    }
+    else {
+        urlStruct.index(request, response, acceptedTypes);
+    }
 };
 
 http.createServer(onRequest).listen(port, () => {
