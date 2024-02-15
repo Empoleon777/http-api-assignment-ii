@@ -12,11 +12,11 @@ const urlStruct = {
         '/style.css': htmlHandler.getCSS,
         '/getUsers': jsonHandler.success,
         '/addUsers': jsonHandler.success,
-        notFound: jsonHandler.notFound,
+        notFound: jsonHandler.notFound
     },
     HEAD: {
         '/getUsers': jsonHandler.getUsersMeta,
-        notFound: jsonHandler.notFoundMeta,
+        notFound: jsonHandler.notFoundMeta
     },
 };
 
@@ -49,9 +49,11 @@ const handlePost = (request, response, parsedUrl) => {
 const handleGet = (request, response, parsedUrl) => {
     if (parsedUrl.pathname === '/style.css') {
         htmlHandler.getCSS(request, response);
-    } else if (parsedUrl.pathname === '/getUsers') {
+    }
+    else if (parsedUrl.pathname === '/getUsers') {
         jsonHandler.getUsers(request, response);
-    } else {
+    }
+    else {
         htmlHandler.getIndex(request, response);
     }
 };
@@ -61,19 +63,20 @@ const onRequest = (request, response) => {
 
     if (request.method === 'POST') {
         handlePost(request, response, parsedUrl);
-    } else {
+    }
+    else {
         handleGet(request, response, parsedUrl);
     }
 
-    if (!urlStruct[request.method]) {
-        return urlStruct.HEAD.notFound(request, response);
-    }
+    // if (!urlStruct[request.method]) {
+    //     return urlStruct.HEAD.notFound(request, response);
+    // }
 
-    if (urlStruct[request.method][parsedUrl.pathname]) {
-        return urlStruct[request.method][parsedUrl.pathname](request, response);
-    }
+    // if (urlStruct[request.method][parsedUrl.pathname]) {
+    //     return urlStruct[request.method][parsedUrl.pathname](request, response);
+    // }
 
-    return urlStruct[request.method].notFound(request, response);
+    // return urlStruct[request.method].notFound(request, response);
 };
 
 http.createServer(onRequest).listen(port, () => {
