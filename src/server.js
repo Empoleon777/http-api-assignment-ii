@@ -6,19 +6,19 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const urlStruct = {
-    GET: {
-        '/': htmlHandler.getIndex,
-        '/style.css': htmlHandler.getCSS,
-        '/getUsers': jsonHandler.success,
-        '/addUsers': jsonHandler.success,
-        notFound: jsonHandler.notFound
-    },
-    HEAD: {
-        '/getUsers': jsonHandler.getUsersMeta,
-        notFound: jsonHandler.notFoundMeta
-    },
-};
+// const urlStruct = {
+//   GET: {
+//     '/': htmlHandler.getIndex,
+//     '/style.css': htmlHandler.getCSS,
+//     '/getUsers': jsonHandler.success,
+//     '/addUsers': jsonHandler.success,
+//     notFound: jsonHandler.notFound,
+//   },
+//   HEAD: {
+//     '/getUsers': jsonHandler.getUsersMeta,
+//     notFound: jsonHandler.notFoundMeta,
+//   },
+// };
 
 const parseBody = (request, response, handler) => {
     const body = [];
@@ -47,14 +47,17 @@ const handlePost = (request, response, parsedUrl) => {
 };
 
 const handleGet = (request, response, parsedUrl) => {
-    if (parsedUrl.pathname === '/style.css') {
+    if (parsedUrl.pathname === '/') {
+        htmlHandler.getIndex(request, response);
+    }
+    else if (parsedUrl.pathname === '/style.css') {
         htmlHandler.getCSS(request, response);
     }
     else if (parsedUrl.pathname === '/getUsers') {
         jsonHandler.getUsers(request, response);
     }
     else {
-        htmlHandler.getIndex(request, response);
+        jsonHandler.notFound(request, response);
     }
 };
 
@@ -68,15 +71,15 @@ const onRequest = (request, response) => {
         handleGet(request, response, parsedUrl);
     }
 
-    // if (!urlStruct[request.method]) {
-    //     return urlStruct.HEAD.notFound(request, response);
-    // }
+    //   if (!urlStruct[request.method]) {
+    //       return urlStruct.HEAD.notFound(request, response);
+    //   }
 
-    // if (urlStruct[request.method][parsedUrl.pathname]) {
-    //     return urlStruct[request.method][parsedUrl.pathname](request, response);
-    // }
+    //   if (urlStruct[request.method][parsedUrl.pathname]) {
+    //       return urlStruct[request.method][parsedUrl.pathname](request, response);
+    //   }
 
-    // return urlStruct[request.method].notFound(request, response);
+    //   return urlStruct[request.method].notFound(request, response);
 };
 
 http.createServer(onRequest).listen(port, () => {
