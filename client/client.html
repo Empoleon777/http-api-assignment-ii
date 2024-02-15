@@ -27,9 +27,10 @@
           break;
       }
 
-      let obj = await response.json();
+      let obj;
 
       if (parseResponse) {
+        obj = await response.json();
         let jsonString = JSON.stringify(obj);
         content.innerHTML += `<p>${jsonString}</p>`;
       }
@@ -37,8 +38,10 @@
         content.innerHTML += '<p>Meta Data Received</p>';
       }
 
-      if (obj.message) {
-        content.innerHTML += `<p>${obj.message}</p>`;
+      if (obj) {
+        if (obj.message) {
+          content.innerHTML += `<p>${obj.message}</p>`;
+        }
       }
 
       console.log(obj);
